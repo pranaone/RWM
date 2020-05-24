@@ -1,0 +1,229 @@
+﻿@model Ridewithme.Models.Ride
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "CreateRideRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<hr />
+
+<h5> Please fill in the ride details below </h5>
+
+<hr />
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-group">
+
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @{Model.Type = (Ridewithme.Models.RideType)1;}
+    @Html.HiddenFor(model => model.Type)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Origin, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Origin, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Origin, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Destination, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Destination, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Destination, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Schedule, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EnumDropDownListFor(model => model.Schedule, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Schedule, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group" id="RideOccurance">
+        @Html.LabelFor(model => model.Occurance, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EnumDropDownListFor(model => model.Occurance, htmlAttributes: new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Occurance, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.Message, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Message, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.ContactNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorFor(model => model.ContactNumber, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.ContactNumber, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    @{Model.DateAdded = DateTime.Today.ToLongDateString();}
+    @Html.HiddenFor(model => model.DateAdded)
+
+    @{Model.UserName = User.Identity.GetUserName(); }
+    @Html.HiddenFor(model => model.UserName)
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Create" class="btn btn-outline-success" />
+            <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary"> Back </a>
+        </div>
+    </div>
+
+
+</div>
+}
+
+<div id="map"> </div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('#Schedule').change(function () {
+
+                if ($(this).find(':selected').text() != "One Time") {
+
+                    $('#RideOccurance').show();
+                } else {
+
+                    $('#RideOccurance').hide();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                mapTypeControl: false,
+                center: { lat: 6.9271, lng: 79.8612 },
+                zoom: 13
+            });
+
+            new AutocompleteDirectionsHandler(map);
+        }
+
+        function AutocompleteDirectionsHandler(map) {
+            this.map = map;
+            this.originPlaceId = null;
+            this.destinationPlaceId = null;
+            this.travelMode = 'DRIVING';
+            this.directionsService = new google.maps.DirectionsService;
+            this.directionsDisplay = new google.maps.DirectionsRenderer;
+            this.directionsDisplay.setMap(map);
+
+            var originInput = document.getElementById('Origin');
+            var destinationInput = document.getElementById('Destination');
+            var modeSelector = 'DRIVING';
+
+            var originAutocomplete = new google.maps.places.Autocomplete(originInput);
+            // Specify just the place data fields that you need.
+            originAutocomplete.setFields(['place_id']);
+
+            var destinationAutocomplete =
+                new google.maps.places.Autocomplete(destinationInput);
+            // Specify just the place data fields that you need.
+            destinationAutocomplete.setFields(['place_id']);
+
+
+            this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+            this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+
+            //this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(originInput);
+            //this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(
+            //destinationInput);
+            this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+        }
+
+        // Sets a listener on a radio button to change the filter type on Places
+        // Autocomplete.
+        AutocompleteDirectionsHandler.prototype.setupClickListener = function (
+            id, mode) {
+            var radioButton = document.getElementById(id);
+            var me = this;
+
+            radioButton.addEventListener('click', function () {
+                me.travelMode = mode;
+                me.route();
+            });
+        };
+
+        AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function (
+            autocomplete, mode) {
+            var me = this;
+            autocomplete.bindTo('bounds', this.map);
+
+            autocomplete.addListener('place_changed', function () {
+                var place = autocomplete.getPlace();
+
+                if (!place.place_id) {
+                    window.alert('Please select an option from the dropdown list.');
+                    return;
+                }
+                if (mode === 'ORIG') {
+                    me.originPlaceId = place.place_id;
+                } else {
+                    me.destinationPlaceId = place.place_id;
+                }
+                me.route();
+            });
+        };
+
+        AutocompleteDirectionsHandler.prototype.route = function () {
+            if (!this.originPlaceId || !this.destinationPlaceId) {
+                return;
+            }
+            var me = this;
+
+            this.directionsService.route(
+                {
+                    origin: { 'placeId': this.originPlaceId },
+                    destination: { 'placeId': this.destinationPlaceId },
+                    travelMode: this.travelMode
+                },
+                function (response, status) {
+                    if (status === 'OK') {
+                        // Display the distance:
+                        document.getElementById('TripDistance').value =
+                            ((response.routes[0].legs[0].distance.value) / 1000).toFixed(0);
+
+                        me.directionsDisplay.setDirections(response);
+
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+        };
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR-API-KEYjs&libraries=places&callback=initMap"
+            async defer></script>
+
+}
+
+
+
+<style>
+    #map {
+        height: auto;
+        width: auto;
+        margin: auto;
+    }
+</style>
