@@ -1,0 +1,35 @@
+﻿@model Ridewithme.Models.Fuel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Fuel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FuelName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FuelName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.FuelPrice)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FuelPrice)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.FuelID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Ridewithme.Models.Ride>
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<hr />
+    
+<h5> All Rides </h5>
+
+<hr />
+
+@foreach (var item in Model)
+{
+    <div class="card text-sm-center">
+
+        <div class="card-header">
+
+            [Ride @Html.DisplayFor(modelItem => item.Type) From @Html.DisplayFor(modelItem => item.UserName)]
+
+            <br />
+
+            <h5 class="card-title"> @Html.DisplayFor(modelItem => item.Origin) to @Html.DisplayFor(modelItem => item.Destination) </h5>
+
+        </div>
+
+        <div class="card-body">
+
+            <label> Ride Schedule : </label> @Html.DisplayFor(modelItem => item.Schedule) (@Html.DisplayFor(modelItem => item.Occurance)) <br />
+
+            <lable> Vehicle : </lable> @Html.DisplayFor(modelItem => item.Color) @Html.DisplayFor(modelItem => item.Model) (@Html.DisplayFor(modelItem => item.VehicleType)) <br /> <br />
+
+            <label> Air Conditioned : </label> @Html.DisplayFor(modelItem => item.AirConditioned) <br />
+
+            <label> Available Seats : </label> @Html.DisplayFor(modelItem => item.AvailableSeats) <br />
+
+            <label> Passenger Contribution : </label> @Html.DisplayFor(modelItem => item.Contribution) <br />
+
+            <label> Message : </label> @Html.DisplayFor(modelItem => item.Message) <br />
+
+
+            <a href="tel:@Html.DisplayFor(modelItem => item.ContactNumber)" class="btn btn-outline-success">Contact</a>
+
+            @if (@item.UserName == User.Identity.GetUserName())
+            {
+
+                <a href="@Url.Action("Edit", "Rides", new { id = item.RideID, user = User.Identity.GetUserName() })" class="btn btn-outline-warning"> Edit </a>
+
+                <a href="@Url.Action("Delete", "Rides", new { id = item.RideID })" class="btn btn-outline-danger"> Delete </a>
+            }
+
+            <a href="@Url.Action("Details", "Rides", new { id = item.RideID })" class="btn btn-outline-primary"> Details </a>
+
+
+        </div>
+
+
+        <div class="card-footer text-muted">
+
+            <img src="@Url.Action("PhotoByName", "Account" , new { UserName = @item.UserName })" class="rounded-circle z-depth-0" height="30"> Posted :  @Html.DisplayFor(modelItem => item.DateAdded)
+
+        </div>
+
+    </div>
+
+    <br />
+
+}
+

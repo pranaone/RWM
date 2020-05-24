@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - RideWithMe </title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script>
+        document.onreadystatechange = function () {
+            var state = document.readyState
+            if (state == 'complete') {
+                document.getElementById('interactive');
+                document.getElementById('load').style.visibility = "hidden";
+            }
+        }
+    </script>
+
+    <style>
+        #load {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 999;
+            background: url(../../Content/copper-loader.gif) no-repeat fixed center;
+            opacity:0.9;
+        }
+    </style>
+
+
+</head>
+<body>
+    <div id="load"></div>
+    <style>
+        .dropdown-item:hover, .dropdown-item:focus {
+            color: #ffffff;
+            text-decoration: none;
+            background-color: #000000;
+        }
+    </style>
+    <div>
+        <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand text-warning" href="@Url.Action("Index", "Home")"><img src="~/Content/logo.png" width="100" height="25" /> <img src="~/Content/icons8-color-48.png" height="30" /></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-success" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-car-side"></i> Rides
+                        </a>
+                        <div class="dropdown-menu" caria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="@Url.Action("Offers", "Rides")">Ride Offers</a>
+
+
+                            @using Microsoft.AspNet.Identity
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (User.IsInRole("Driver"))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("Requests", "Rides")">Ride Requests</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("Create", "Rides")">Add Rides</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("MyRides", "Rides", new {Username = User.Identity.GetUserName()})"> My Rides</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("Request", "RideReservations", new { Driver = User.Identity.GetUserName() })"> Manage Reservations Request </a>
+                                }
+                                if (User.IsInRole("Passenger"))
+                                {
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("CreateRideRequest", "Rides")">Add Ride Request</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="@Url.Action("Status", "RideReservations", new { Passenger = User.Identity.GetUserName() })"> Check Reservations Status </a>
+                                }
+                            }
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="@Url.Action("Updates", "Traffic")"><i class="fas fa-traffic-light"></i> Traffic Updates</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-warning" href="#" data-toggle="modal" data-target="#myModal"><i class="fas fa-gas-pump"></i> Fuel Cost Calculator</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-info" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-info-circle"></i> About
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="@Url.Action("About", "Home")">Project Information</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="@Url.Action("Contact", "Home")">Contact Developer</a>
+                        </div>
+
+                    </li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </nav>
+    </div>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content bg-light">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title white-text w-100 font-weight-bold py-2">Fuel Cost Calculator</h4>
+                </div>
+                <div class="modal-body justify-content-center">
+                    <div class="row">
+                        <div class="col-4"> <strong> Trip Distance</strong> </div>
+                        <div class="col-5"> @Html.TextBox("TripDistance", null, new { @class = "form-control", @type = "number", min = 0 }) </div>
+                        <div class="col-3"> Km(s)</div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-4"> <strong> Passengers </strong> </div>
+                        <div class="col-5"> @Html.TextBox("Passengers", 0, new { @class = "form-control", @type = "number", min = 0 }) </div>
+                        <div class="col-3"> Person(s) </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-4"> <strong> Fuel Efficency </strong>  </div>
+                        <div class="col-5"> @Html.TextBox("FuelEfficency", null, new { @class = "form-control", @type = "number", min = 0 }) </div>
+                        <div class="col-3"> Km(s)/Ltr </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-4"> <strong> Fuel Type </strong> </div>
+                        <div class="col-5">
+                            @*@Html.DropDownList("FuelType", (IEnumerable
+                                <SelectListItem>)ViewData["FuelList"])*@
+
+                            @Html.DropDownList("FuelType", new List<SelectListItem>{
+                                new SelectListItem { Value = "137" , Text = "Petrol 92" },
+                                new SelectListItem { Value = "161" , Text = "Petrol 95" },
+                                new SelectListItem { Value = "104" , Text = "Auto Diesel" },
+                                new SelectListItem { Value = "132" , Text = "Super Diesel" }}, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row justify-content-center">
+                        <div class="col-4"> <input type="checkbox" id="withAC">  <strong> With A/C </strong> </div>
+                        <div class="col-4"> <input type="checkbox" id="roundTrip"> <strong> Round Trip </strong> </div>
+
+                    </div>
+                    <hr />
+                    <div class="text-center">
+                        <label class="text-success" id="outputlabel"> </label>
+                        <br />
+                        <label class="text-info" id="outputlabel2"> </label>
+                        <br />
+                    </div>
+
+                </div>
+                <div class="modal-footer justify-content-center">
+
+                    <button onclick="CalculateFuelCost()" class="btn btn-outline-primary" type="button"> Calculate </button>
+
+                    <button onclick="ClearLabel()" type="button" class="btn btn-outline-danger" data-dismiss="modal"> Close</button>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+
+            function CalculateFuelCost() {
+
+                //get values from user
+                var tripDistance = parseInt(document.getElementById('TripDistance').value);
+                var fuelEfficency = parseInt(document.getElementById('FuelEfficency').value);
+                var fuelPrice = parseInt(document.getElementById('FuelType').value);
+                var passengers = parseInt(document.getElementById('Passengers').value);
+                var checkBox1 = document.getElementById("withAC");
+                var checkBox2 = document.getElementById("roundTrip");
+
+                // perform calculations
+                var nFuelEfficency = fuelEfficency - (passengers * 0.5);
+                var FuelCost = ((tripDistance / nFuelEfficency) * fuelPrice).toFixed(0);
+                var FuelCostAC = ((tripDistance / (nFuelEfficency - 2)) * fuelPrice).toFixed(0);
+                var FuelCostRT = FuelCost * 2;
+                var FuelCostACRT = FuelCostAC * 2;
+                var Contribution = (FuelCost / (passengers + 1)).toFixed(0);
+                var ContributionAC = (FuelCostAC / (passengers + 1)).toFixed(0);
+                var ContributionRT = Contribution * 2;
+                var ContributionACRT = ContributionAC * 2;
+
+                if (isNaN(FuelCost)) {
+                    document.getElementById('outputlabel').innerHTML = "Please enter valid parameters!!";
+                }
+                else if (checkBox1.checked == true && checkBox2.checked == true) {
+                    document.getElementById('outputlabel').innerHTML = "Estimated Fuel Cost is " + "Rs. " + FuelCostACRT + " /-";
+                    if (passengers != 0) {
+                        document.getElementById('outputlabel2').innerHTML = "Passenger Contribution " + "Rs. " + ContributionACRT + " /-";
+                    }
+                }
+                else if (checkBox1.checked == true && checkBox2.checked == false) {
+                    document.getElementById('outputlabel').innerHTML = "Estimated Fuel Cost is " + "Rs. " + FuelCostAC + " /-";
+                    if (passengers != 0) {
+                        document.getElementById('outputlabel2').innerHTML = "Passenger Contribution " + "Rs. " + ContributionAC + " /-";
+                    }
+                }
+                else if (checkBox1.checked == false && checkBox2.checked == true) {
+                    document.getElementById('outputlabel').innerHTML = "Estimated Fuel Cost is " + "Rs. " + FuelCostRT + " /-";
+                    if (passengers != 0) {
+                        document.getElementById('outputlabel2').innerHTML = "Passenger Contribution " + "Rs. " + ContributionRT + " /-";
+                    }
+                }
+                else {
+                    document.getElementById('outputlabel').innerHTML = "Estimated Fuel Cost is " + "Rs. " + FuelCost + " /-";
+                    if (passengers != 0) {
+                        document.getElementById('outputlabel2').innerHTML = "Passenger Contribution " + "Rs. " + Contribution + " /-";
+                    }
+                }
+            }
+            function ClearLabel() {
+                document.getElementById('outputlabel').innerHTML = "";
+                document.getElementById('outputlabel2').innerHTML = "";
+                document.getElementById('TripDistance').value = "";
+                document.getElementById('FuelEfficency').value = "";
+                document.getElementById('Passengers').value = 0;
+                document.getElementById("withAC").checked = false;
+                document.getElementById("roundTrip").checked = false;
+            }
+
+        </script>
+
+
+
+
+    <div class="container body-content">
+        @RenderBody()
+
+        <hr />
+
+        <footer>
+            <nav class="navbar rounded navbar-dark bg-dark text-light text-center">
+                <div class="mx-md-auto"> Copyright &copy 2019 RideWithMe - All Rights Reserved </div>
+            </nav>
+        </footer>
+    </div>
+
+
+    @Scripts.Render("~/bundles/lib")
+    @Styles.Render("~/Content/font-awesome")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+

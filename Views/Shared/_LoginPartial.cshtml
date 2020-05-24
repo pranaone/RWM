@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNet.Identity
+@if (Request.IsAuthenticated)
+{
+    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+    @Html.AntiForgeryToken()
+
+    <ul class="navbar navbar-nav navbar-right">
+        <li class="nav-item avatar mr-3 mt-2 mb-2">
+            <a class="nav-link p-0" href="@Url.Action("Index", "Manage")">
+                <img src="@Url.Action("Photo", "Account" , new { UserId=User.Identity.GetUserId() })" class="rounded-circle z-depth-0"
+                     alt="avatar image" height="30">
+            </a>
+        </li>
+        <li class="mr-3 mt-2 mb-2">
+            @Html.ActionLink("Welcome " + User.Identity.GetUserName() + " !", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
+        </li>
+
+        <li class="mr-3 mt-2 mb-2"> <i class="fas fa-sign-out-alt text-light"></i> <a href="javascript:document.getElementById('logoutForm').submit()"> Log off </a></li>
+    </ul>
+    }
+}
+else
+{
+<ul class="nav navbar-nav navbar-right">
+    <li class="mr-3 mt-2 mb-2">
+    <i class="fas fa-user-plus text-light"></i> 
+    @Html.ActionLink("Register", "Register", "Account", routeValues: null, htmlAttributes: new { id = "registerLink" })
+    </li>
+    <li class="mr-3 mt-2 mt-2">
+    <i class="fas fa-user-circle text-light"></i> 
+    @Html.ActionLink("Log in", "Login", "Account", routeValues: null, htmlAttributes: new { id = "loginLink" }) 
+    </li>
+</ul>
+}

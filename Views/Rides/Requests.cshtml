@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Ridewithme.Models.Ride>
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Requests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<hr />
+
+<h5> Ride Requests </h5>
+
+<hr />
+
+@foreach (var item in Model)
+{
+    <div class="card text-lg-center">
+
+        <div class="card-header">
+            [Ride @Html.DisplayFor(modelItem => item.Type) From @Html.DisplayFor(modelItem => item.UserName)] <br />
+            <h5 class="card-title"> @Html.DisplayFor(modelItem => item.Origin) to @Html.DisplayFor(modelItem => item.Destination) </h5>
+        </div>
+
+        <div class="card-body">
+
+            <label> Message : </label> @Html.DisplayFor(modelItem => item.Message) <br />
+
+            <br />
+
+            <a href="tel:@Html.DisplayFor(modelItem => item.ContactNumber)" class="btn btn-outline-success">Contact</a>
+
+        </div>
+
+
+        <div class="card-footer text-muted">
+            <img src="@Url.Action("PhotoByName", "Account" , new { UserName = @item.UserName })" class="rounded-circle z-depth-0" height="30"> Posted :  @Html.DisplayFor(modelItem => item.DateAdded)
+        </div>
+
+    </div>
+
+    <br />
+
+}

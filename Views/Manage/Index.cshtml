@@ -1,0 +1,32 @@
+﻿@model Ridewithme.Models.IndexViewModel
+@{
+    ViewBag.Title = "Manage";
+}
+
+    <hr />
+
+<p class="text-success">@ViewBag.StatusMessage</p>
+
+<div>
+    <h5>Change your account information</h5>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Password:</dt>
+        <dd>
+            [
+            @if (Model.HasPassword)
+            {
+                @Html.ActionLink("Change your password", "ChangePassword")
+            }
+            else
+            {
+                @Html.ActionLink("Create", "SetPassword")
+            }
+            ]
+        </dd>
+        <dt>Profile Picture:</dt>
+        <dd>
+            [ @Html.ActionLink("Change your profile picture", "UserProfile", "Account") ]
+        </dd>
+    </dl>
+</div>

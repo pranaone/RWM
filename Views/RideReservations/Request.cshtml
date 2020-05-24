@@ -1,0 +1,73 @@
+﻿@model IEnumerable<Ridewithme.Models.RideReservation>
+
+<hr />
+
+<h5> Reservation Requests </h5>
+
+<hr />
+@if (!Model.Any())
+{
+    <strong> You do not have any reservations..</strong>
+}
+else
+{
+    <table id="example" class="table table-bordered">
+        <tr>
+            <th>
+                <label> Passenger Name </label>
+            </th>
+            <th>
+                <label> Seats </label>
+            </th>
+            <th>
+                <label> Status </label>
+            </th>
+            <th>
+                <label> Manage </label>
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PassengerName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeatsRequired)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReservationStatus)
+                </td>
+                <td>
+                    @if (item.ReservationStatus != "Accepted")
+                    {
+                        <a href=" @Url.Action("Accept", "RideReservations", new { id = item.ReservationID, seats = item.SeatsRequired })" class="btn btn-outline-success"> Accept </a>
+                        <br /> <br />
+                    }
+                    @if (item.ReservationStatus != "Declined")
+                    {
+                        <a href=" @Url.Action("Decline", "RideReservations", new { id = item.ReservationID, seats = item.SeatsRequired })" class="btn btn-outline-danger"> Decline </a>
+                    }
+                </td>
+            </tr>
+        }
+
+    </table>
+
+}
+
+@section scripts
+{
+    
+
+    @*<script>
+        $(document).ready(function () {
+            $('#example').DataTable();
+
+
+        });
+    </script>*@
+
+}
+

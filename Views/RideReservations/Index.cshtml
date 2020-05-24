@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Ridewithme.Models.RideReservation>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.RideID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DriverName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PassengerName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SeatsRequired)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ReservationStatus)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.RideID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DriverName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PassengerName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SeatsRequired)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ReservationStatus)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.ReservationID }) |
+            @Html.ActionLink("Details", "Details", new { id=item.ReservationID }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.ReservationID })
+        </td>
+    </tr>
+}
+
+</table>

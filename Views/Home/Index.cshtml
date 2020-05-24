@@ -1,0 +1,232 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Home Page";
+
+
+}
+<hr />
+
+<div class="form-inline justify-content-center">
+    @using (Html.BeginForm("Search", "Rides", FormMethod.Get))
+    {
+        @Html.TextBox("start", null, new { @placeholder = "Start Location", @class = "form-control form-text form-group mx-lg-2 mb-2" })
+
+        @Html.TextBox("destination", null, new { @placeholder = "Destination Location", @class = "form-control form-text form-group mx-lg-2 mb-2" })
+
+        <input class="btn btn-outline-success my-2 my-lg-2 fas fa-search" type="submit" data-loading-text="Loading..." value="&#xf002; Search Ride" />
+
+        @*if (User.Identity.IsAuthenticated)
+        {
+            if (User.IsInRole("Driver"))
+            {
+                <br />
+
+                <input class="btn btn-outline-warning my-2 my-lg-2 fas fa-gas-pump" type="button" data-toggle="modal" data-target="#myModal" value="&#xf52f; Calculate Fuel Cost" />
+            }
+        }*@
+
+        <hr />
+
+        <div id="LocationValidation" class="alert alert-primary alert-dismissible collapse">
+
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+
+            <label id="message">  </label>
+
+        </div>
+
+        <div id="myalert" class="alert alert-primary alert-dismissible collapse">
+
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+
+            <label id="distance"> </label>
+
+            <label id="duration"> </label>
+        </div>
+
+        <hr />
+
+        <div class="jumbotron" id="map">
+
+        </div>
+
+
+        if (TempData["Message"] != null)
+        {
+            <script type="text/javascript">
+
+                window.onload = function () {
+
+                    $('#LocationValidation').show('fade');
+                    document.getElementById('message').innerHTML = "@TempData["Message"]";
+
+                };
+            </script>
+        }
+
+    }
+
+</div>
+
+@section Scripts{
+
+    <script>
+        var map, infoWindow;
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                mapTypeControl: false,
+                center: { lat: 6.9271, lng: 79.8612 },
+                zoom: 12
+            });
+            infoWindow = new google.maps.InfoWindow;
+            new AutocompleteDirectionsHandler(map);
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    infoWindow.setPosition(pos);
+                    infoWindow.setContent('You are here!!');
+                    infoWindow.open(map);
+                    map.setCenter(pos);
+                }, function () {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+        }
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(browserHasGeolocation ?
+                'Error: The Geolocation service failed.' :
+                'Error: Your browser doesn\'t support geolocation.');
+            infoWindow.open(map);
+        }
+
+        function AutocompleteDirectionsHandler(map) {
+            this.map = map;
+            this.originPlaceId = null;
+            this.destinationPlaceId = null;
+            this.travelMode = 'DRIVING';
+            this.directionsService = new google.maps.DirectionsService;
+            this.directionsDisplay = new google.maps.DirectionsRenderer;
+            this.directionsDisplay.setMap(map);
+
+            var originInput = document.getElementById('start');
+            var destinationInput = document.getElementById('destination');
+            var modeSelector = 'DRIVING';
+
+            var originAutocomplete = new google.maps.places.Autocomplete(originInput);
+            // Specify just the place data fields that you need.
+            originAutocomplete.setFields(['place_id']);
+
+            var destinationAutocomplete =
+                new google.maps.places.Autocomplete(destinationInput);
+            // Specify just the place data fields that you need.
+            destinationAutocomplete.setFields(['place_id']);
+
+
+            this.setupPlaceChangedListener(originAutocomplete, 'ORIG');
+            this.setupPlaceChangedListener(destinationAutocomplete, 'DEST');
+            this.map.controls[google.maps.ControlPosition.TOP_LEFT].push(modeSelector);
+        }
+
+        // Sets a listener on a radio button to change the filter type on Places
+        // Autocomplete.
+        AutocompleteDirectionsHandler.prototype.setupClickListener = function (
+            id, mode) {
+            var radioButton = document.getElementById(id);
+            var me = this;
+
+            radioButton.addEventListener('click', function () {
+                me.travelMode = mode;
+                me.route();
+            });
+        };
+
+        AutocompleteDirectionsHandler.prototype.setupPlaceChangedListener = function (
+            autocomplete, mode) {
+            var me = this;
+            autocomplete.bindTo('bounds', this.map);
+
+            autocomplete.addListener('place_changed', function () {
+                var place = autocomplete.getPlace();
+
+                if (!place.place_id) {
+                    window.alert('Please select an option from the dropdown list.');
+                    return;
+                }
+                if (mode === 'ORIG') {
+                    me.originPlaceId = place.place_id;
+                } else {
+                    me.destinationPlaceId = place.place_id;
+                }
+                me.route();
+            });
+        };
+
+        AutocompleteDirectionsHandler.prototype.route = function () {
+            if (!this.originPlaceId || !this.destinationPlaceId) {
+                return;
+            }
+            var me = this;
+
+            this.directionsService.route(
+                {
+                    origin: { 'placeId': this.originPlaceId },
+                    destination: { 'placeId': this.destinationPlaceId },
+                    travelMode: this.travelMode
+                },
+                function (response, status) {
+                    if (status === 'OK') {
+
+                        $('#LocationValidation').hide('fade');
+                        $('#myalert').show('fade');
+
+                        // Display the distance:
+                        var dis = ((response.routes[0].legs[0].distance.value) / 1000).toFixed(0);
+                        document.getElementById('distance').innerHTML = "Trip Distance : " + dis + " Kilometers";
+
+                        document.getElementById('TripDistance').value =
+                            ((response.routes[0].legs[0].distance.value) / 1000).toFixed(0);
+
+                        // Display the duration:
+                        var dur = ((response.routes[0].legs[0].duration.value) / 60).toFixed(0);
+                        if (dur >= 60) {
+
+                            var durHr = (dur / 60).toFixed(2);
+                            document.getElementById('duration').innerHTML = "Estimated Time : " + durHr + " Hours";
+
+                        } else {
+
+                            document.getElementById('duration').innerHTML = "Estimated Time : " + dur + " Minutes";
+                        }
+
+                        me.directionsDisplay.setDirections(response);
+                    } else {
+                        window.alert('Directions request failed due to ' + status);
+                    }
+                });
+        };
+
+    </script>
+    <script  src="https://maps.googleapis.com/maps/api/js?key=YOUR-API-KEYjs&libraries=places&callback=initMap" async defer></script>
+
+}
+
+
+<style>
+    #map {
+        height: 400px;
+        width: 400px;
+        margin: auto;
+        position: relative;
+        overflow: hidden
+    }
+</style>

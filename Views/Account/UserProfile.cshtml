@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "UserProfile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <hr />
+
+@using (Html.BeginForm("UserProfile", "Manage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <fieldset>
+        <legend>Change your profile picture.</legend>
+        <br />
+
+        <div class="editor-field">
+            <input name="Profile" id="profile" type="file" class="btn-secondary"/>
+        </div>
+        <br />
+        <p>
+            <input type="submit" class="btn btn-outline-primary" value="Update Photo" />
+        </p>
+    </fieldset>
+}

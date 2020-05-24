@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Ridewithme.Models.Ride>
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Offers";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<hr />
+
+<h5> My Rides </h5>
+
+<hr />
+
+@foreach (var item in Model)
+{
+    
+        <div class="card text-lg-center">
+
+            <div class="card-header">
+                [Ride @Html.DisplayFor(modelItem => item.Type) From @Html.DisplayFor(modelItem => item.UserName)] <br />
+                <h5 class="card-title"> @Html.DisplayFor(modelItem => item.Origin) to @Html.DisplayFor(modelItem => item.Destination) </h5>
+            </div>
+
+            <div class="card-body">
+
+                <label> Ride Schedule : </label> @Html.DisplayFor(modelItem => item.Schedule) (@Html.DisplayFor(modelItem => item.Occurance)) <br />
+
+                <lable> Vehicle : </lable> @Html.DisplayFor(modelItem => item.Color) @Html.DisplayFor(modelItem => item.Model) (@Html.DisplayFor(modelItem => item.VehicleType)) <br /> <br />
+
+                <label> Air Conditioned : </label> @Html.DisplayFor(modelItem => item.AirConditioned) <br />
+
+                <label> Available Seats : </label> @Html.DisplayFor(modelItem => item.AvailableSeats) <br />
+
+                <label> Passenger Contribution : </label> @Html.DisplayFor(modelItem => item.Contribution) <br />
+
+                <label> Message : </label> @Html.DisplayFor(modelItem => item.Message) <br />
+
+                @if (item.IsNonSmoking != false)
+                {
+                    <label class="text-danger"> Non Smoking Passengers Only </label>
+
+                }
+
+                <br />
+
+                @if (item.IsMaleOnly != false)
+                {
+                    <label class="text-info"> Male Passengers Only </label>
+
+                }
+
+                @if (item.IsFemaleOnly != false)
+                {
+                    <label class="text-info"> Female Passengers Only </label>
+
+                }
+
+                <br />
+
+                @if (@item.UserName == User.Identity.GetUserName())
+                {
+
+                    <a href="@Url.Action("Edit", "Rides", new { id = item.RideID, user = User.Identity.GetUserName() })" class="btn btn-outline-warning"> Edit </a>
+
+                    <a href="@Url.Action("Delete", "Rides", new { id = item.RideID })" class="btn btn-outline-danger"> Delete </a>
+                }
+            
+
+            </div>
+
+
+            <div class="card-footer text-muted">
+                 Posted :  @Html.DisplayFor(modelItem => item.DateAdded)
+            </div>
+
+        </div>
+
+        <br />
+
+}

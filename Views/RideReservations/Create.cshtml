@@ -1,0 +1,49 @@
+﻿@model Ridewithme.Models.RideReservation
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        <strong>Please specify the number of seats required..</strong>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        @{Model.DriverName = Request.Params["Driver"]; }
+        @Html.HiddenFor(model => model.DriverName)
+
+        @{Model.PassengerName = Request.Params["Passenger"]; }
+        @Html.HiddenFor(model => model.PassengerName)
+
+        @{Model.RideID = int.Parse(Request.Params["RideID"]);}
+        @Html.HiddenFor(model => model.RideID)
+
+        @{Model.ReservationStatus = "Pending"; }
+        @Html.HiddenFor(model => model.ReservationStatus)
+
+        @if (Request.Params["Seats"] != null)
+        {
+            var seats = int.Parse(Request.Params["Seats"]);
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    @Html.EditorFor(model => model.SeatsRequired, new { htmlAttributes = new { @class = "form-control", @type = "number", min = 1, max = seats } })
+                    @Html.ValidationMessageFor(model => model.SeatsRequired, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Reserve" class="btn btn-primary" />
+                <a href="@Url.Action("Index", "Home")" class="btn btn-secondary"> Back </a>
+            </div>
+        </div>
+    </div>
+}

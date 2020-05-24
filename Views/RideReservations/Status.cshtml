@@ -1,0 +1,58 @@
+﻿@model IEnumerable<Ridewithme.Models.RideReservation>
+
+<hr />
+
+<h5> Reservation Status </h5>
+
+<hr />
+@if (!Model.Any())
+{
+    <strong> You do not have any reservations..</strong>
+}
+else
+{
+    <table id="example" class="table table-bordered">
+        <tr>
+            <th>
+                <label> Driver Name </label>
+            </th>
+            <th>
+                <label> Seats </label>
+            </th>
+            <th>
+                <label> Status </label>
+            </th>
+            <th>
+                <label> Manage </label>
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DriverName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeatsRequired)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReservationStatus)
+                </td>
+                <td>
+                    @if (item.ReservationStatus == "Accepted")
+                    {
+                        <a href="tel:@Html.Action("DriverDetails", "RideReservations", new { id = item.ReservationID })" class="btn btn-outline-success">Contact</a>
+                        <br /> <br />
+                    }
+
+                    <a href="@Url.Action("Delete", new { id = item.ReservationID })" class="btn btn-outline-danger"> Remove </a>
+
+                </td>
+            </tr>
+        }
+
+    </table>
+
+}
+
